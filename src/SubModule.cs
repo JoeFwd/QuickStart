@@ -11,7 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-
+using SandBox.GauntletUI;
+using SandBox.View.Map;
+using StoryMode;
 using StoryMode.Behaviors;
 using StoryMode.CharacterCreationContent;
 using StoryMode.StoryModeObjects;
@@ -31,8 +33,6 @@ namespace QuickStart
 {
     public sealed class SubModule : MBSubModuleBase
     {
-        public static string Version => "1.2.1.0";
-
         public static string Name => typeof(SubModule).Namespace;
 
         public static string DisplayName => Name;
@@ -219,7 +219,7 @@ namespace QuickStart
                 }
 
                 DisableElderBrother(isFirst: false); // Do it again at the end for good measure
-                StoryMode.StoryMode.Current.MainStoryLine.CompleteTutorialPhase(isSkipped: true);
+                StoryModeManager.Current.MainStoryLine.CompleteTutorialPhase(isSkipped: true);
             }
 
             if (GameStateManager.Current.ActiveState is MapState)
@@ -480,7 +480,7 @@ namespace QuickStart
                 party.AddElementToMemberRoster(troop, amount, false);
             else
                 Log.LogError($"Could not find troop type to add to party (tier: {tier}, culture: {party.Culture})!");
-         }
+        }
 
         private static Settlement? ChooseStartTown(Kingdom? kingdom)
         {
@@ -514,14 +514,13 @@ namespace QuickStart
                                                                    GameTexts.FindText("str_done", null).ToString(),
                                                                    null,
                                                                    new Action<string>(ChangePlayerName),
-                                                                   null), false);
+                                                                    null), false);
         }
 
         private static void ChangePlayerName(string? name = null)
         {
-            var txtName = new TextObject(name ?? Hero.MainHero.Name.ToString());
-            CharacterObject.PlayerCharacter.Name = txtName;
-            Hero.MainHero.SetName(txtName);
+            var txtName = new TextObject(name ?? NameGenerator.Current.GenerateHeroFirstName(Hero.MainHero).ToString());
+            Hero.MainHero.SetName(txtName, txtName);
             Log.LogTrace($"Set player name: {Hero.MainHero.Name}");
 
             if (name is not null) // if name was deliberately set by the user...
@@ -565,9 +564,7 @@ namespace QuickStart
 
             Game.Current.GameStateManager.PushState(Game.Current.GameStateManager.CreateState<BannerEditorState>(), 0);
         }
-
         /* Non-Public Data */
-
         private static readonly Color SignatureTextColor = Color.FromUint(0x00F16D26);
 
         private const string DefaultPlayerClanName = "Playerclan";

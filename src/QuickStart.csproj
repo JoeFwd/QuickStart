@@ -23,8 +23,8 @@
 
   <!-- Game Versions for Stable and Beta -->
   <PropertyGroup>
-    <GameVersion Condition="$(IsStable) == 'true'">1.6.1</GameVersion>
-    <GameVersion Condition="$(IsBeta) == 'true'">1.6.2</GameVersion>
+    <GameVersion Condition="$(IsStable) == 'true'">1.7.0</GameVersion>
+    <GameVersion Condition="$(IsBeta) == 'true'">1.7.1</GameVersion>
   </PropertyGroup>
 
   <!-- Game Folder(s) -->
@@ -38,6 +38,7 @@
     <GameFolder Condition="$(IsStable) == 'true'">$(BANNERLORD_STABLE_DIR)</GameFolder>
     <GameFolder Condition="$(IsBeta) == 'true'">$(BANNERLORD_BETA_DIR)</GameFolder>
     <GameFolder Condition="$(GameFolder) == ''">$(BANNERLORD_GAME_DIR)</GameFolder>
+    <UseGameFolder>true</UseGameFolder>
   </PropertyGroup>
 
   <!-- Automatic Game Folder Resolution -->
@@ -85,7 +86,14 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="$(UseGameFolder) == '' OR $(UseGameFolder) == 'False'">
+    <PackageReference Include="Bannerlord.ReferenceAssemblies.Core.EarlyAccess" Version="$(GameVersion).*" PrivateAssets="All" />
+    <PackageReference Include="Bannerlord.ReferenceAssemblies.Native.EarlyAccess" Version="$(GameVersion).*" PrivateAssets="All" />
+    <PackageReference Include="Bannerlord.ReferenceAssemblies.StoryMode.EarlyAccess" Version="$(GameVersion).*" PrivateAssets="All" />
+    <PackageReference Include="Bannerlord.ReferenceAssemblies.Sandbox.EarlyAccess" Version="$(GameVersion).*" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(UseGameFolder) != '' AND $(UseGameFolder) != 'False'">
     <!-- Bannerlord Native Assemblies -->
     <Reference Include="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds*.dll" Exclude="$(GameFolder)\bin\Win64_Shipping_Client\TaleWorlds.Native.dll">
       <HintPath>%(Identity)</HintPath>
